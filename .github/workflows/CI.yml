@@ -42,7 +42,7 @@ jobs:
         run: |
           BRANCH=${GITHUB_REF##*/}
           TS=$(date +%s)
-          Revision=$(git rev-parse --short HEAD)"
+          Revision=$(git rev-parse --short HEAD)
           BUILD_ID="${BRANCH}-${REVISION}-${TS}"
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             if [[ $GITHUB_REF == refs/tags/main/* ]]; then
