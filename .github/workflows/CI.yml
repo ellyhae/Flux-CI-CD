@@ -33,7 +33,8 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run test and build
         run: |
-          go test -v ./app/...
+          cd app
+          go test -v ./...
           CGO_ENABLED=0 GOARCH=amd64 go build -o demo
 
       # Declare variables to store build-id
