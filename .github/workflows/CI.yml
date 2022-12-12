@@ -5,10 +5,9 @@ on:
   push:
     branches:
       - '*'
-    tags-ignore:
-      - 'release/*'
-  #pull_request:
-  #  branches: [ 'main', 'integration', 'dev' ]
+  pull_request:
+    branches:
+      - '*'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -36,8 +35,6 @@ jobs:
 #          CGO_ENABLED=0 GOARCH=amd64 go build -o demo
 
       # Declare variables to store build-id
-      # If normal push, create image with format "branch-sha-time"
-      # If tagged, i.e. release for branch, create image with format "tag-branch", unless branch is "main", then the image name is just "tag"
       - name: Declare variables
         id: vars
         run: |
@@ -50,9 +47,7 @@ jobs:
             BUILD_ID=${GITHUB_REF/refs\/tags\//}
           fi
           echo ${BUILD_ID}
-          echo ::set-output name=BUILD_ID::${BUILD_ID}
-#          echo ::set-output name=VERSION::${VERSION}
-#          echo ::set-output name=BUILD_ID::${BUILD_ID}
+          echo "BUILD_ID=${BUILD_ID}" >> $GITHUB_OUTPUT
 
 #      # Boot Docker builder using by default the docker-container
 #      - name: Set up Docker Buildx
