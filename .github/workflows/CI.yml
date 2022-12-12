@@ -2,10 +2,11 @@ name: CI
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ 'main' ]
-    tags: [ '*' ]
+    branches:
+      - '*'
+    tags-ignore:
+      - 'release/*'
   #pull_request:
   #  branches: [ 'main', 'integration', 'dev' ]
 
@@ -40,11 +41,16 @@ jobs:
       - name: Declare variables
         id: vars
         run: |
-          VERSION=${GITHUB_SHA::8}
+          BRANCH=${GITHUB_REF##*/}
+          TS=$(date +%s)
+          REVISION=${GITHUB_SHA::8}
+          BUILD_ID="${BRANCH}-${REVISION}-${TS}"
+          LATEST_ID=canary
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF/refs\/tags\//}
+            BUILD_ID=${GITHUB_REF/refs\/tags\//}
           fi
-          echo ${VERSION}
+          echo ${BUILD_ID}
+          echo ::set-output name=BUILD_ID::${BUILD_ID}
 #          echo ::set-output name=VERSION::${VERSION}
 #          echo ::set-output name=BUILD_ID::${BUILD_ID}
 
