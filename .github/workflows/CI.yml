@@ -4,8 +4,8 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ 'main', 'integration', 'dev' ]
-    tags: [ 'main/*', 'integration/*', 'dev/*' ]
+    branches: [ 'main' ]
+    tags: [ 'main/*' ]
   #pull_request:
   #  branches: [ 'main', 'integration', 'dev' ]
 
@@ -40,18 +40,12 @@ jobs:
       - name: Declare variables
         id: vars
         run: |
-          BRANCH=${GITHUB_REF##*/}
-          TS=$(date +%s)
-          REVISION=${GITHUB_SHA::8}
-          BUILD_ID="${BRANCH}-${REVISION}-${TS}"
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            if [[ $GITHUB_REF == refs/tags/main/* ]]; then
-              BUILD_ID=${GITHUB_REF/refs\/tags\/main\//}
-            else
-              BUILD_ID=${GITHUB_REF/refs\/tags\//}
-            fi
+          VERSION=${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/main/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\/main\//}
           fi
-          echo ${BUILD_ID}
+          echo ${VERSION}
+#          echo ::set-output name=VERSION::${VERSION}
 #          echo ::set-output name=BUILD_ID::${BUILD_ID}
 
 #      # Boot Docker builder using by default the docker-container
