@@ -5,7 +5,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ 'main' ]
-    tags: [ 'main/*' ]
+    tags: [ '*' ]
   #pull_request:
   #  branches: [ 'main', 'integration', 'dev' ]
 
@@ -29,10 +29,10 @@ jobs:
         run: echo Start to test and build the artifact
 
       # Runs a set of commands using the runners shell
-      - name: Run test and build
-        run: |
-          go test -v ./...
-          CGO_ENABLED=0 GOARCH=amd64 go build -o demo
+#      - name: Run test and build
+#        run: |
+#          go test -v ./...
+#          CGO_ENABLED=0 GOARCH=amd64 go build -o demo
 
       # Declare variables to store build-id
       # If normal push, create image with format "branch-sha-time"
@@ -41,8 +41,8 @@ jobs:
         id: vars
         run: |
           VERSION=${GITHUB_SHA::8}
-          if [[ $GITHUB_REF == refs/tags/main/* ]]; then
-            VERSION=${GITHUB_REF/refs\/tags\/main\//}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\//}
           fi
           echo ${VERSION}
 #          echo ::set-output name=VERSION::${VERSION}
