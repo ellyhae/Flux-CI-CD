@@ -35,6 +35,7 @@ jobs:
 
       # Declare variables to store build-id
       - name: Declare variables
+        id: vars
         run: |
           BRANCH=${GITHUB_REF##*/}
           TS=$(date +%s)
@@ -65,4 +66,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/app:${{ BUILD_ID }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/app:${{ steps.vars.outputs.BUILD_ID }}
