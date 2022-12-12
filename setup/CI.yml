@@ -1,0 +1,75 @@
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ 'main', 'integration', 'dev' ]
+    tags: [ 'main/*', 'integration/*', 'dev/*' ]
+  #pull_request:
+  #  branches: [ 'main', 'integration', 'dev' ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "continuous_integration"
+  continuous_integration:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Start to test and build the artifact
+
+      # Runs a set of commands using the runners shell
+      - name: Run test and build
+        run: |
+          go test -v ./...
+          CGO_ENABLED=0 GOARCH=amd64 go build -o demo
+
+      # Declare variables to store build-id
+      # If normal push, create image with format "branch-sha-time"
+      # If tagged, i.e. release for branch, create image with format "tag-branch", unless branch is "main", then the image name is just "tag"
+      - name: Declare variables
+        id: vars
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          TS=$(date +%s)
+          Revision=$(git rev-parse --short HEAD)"
+          BUILD_ID="${BRANCH}-${REVISION}-${TS}"
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            if [[ $GITHUB_REF == refs/tags/main/* ]]; then
+              BUILD_ID=${GITHUB_REF/refs\/tags\/main\//}
+            else
+              BUILD_ID=${GITHUB_REF/refs\/tags\//}
+            fi
+          fi
+          echo ${BUILD_ID}
+#          echo ::set-output name=BUILD_ID::${BUILD_ID}
+
+#      # Boot Docker builder using by default the docker-container
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v1
+#      
+#      # Login to DockerHub account
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v1 
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#      
+#      # Build a Docker image based on provided Dockerfile
+#      - name: Build and push
+#        id: docker_build
+#        uses: docker/build-push-action@v2
+#        with:
+#          context: .
+#          push: true
+#          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app:${{ steps.vars.outputs.BUILD_ID }}
