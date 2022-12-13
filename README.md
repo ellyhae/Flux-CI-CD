@@ -13,6 +13,8 @@ As shown, the image name would depend on whether a tag was used or not. The kube
 
 As a basis we would use the deployment demo presented in the lecture. We would update the CI pipeline to produce the naming discussed above. We would then add Flux for manifest synchronization and [Flux image updates](https://fluxcd.io/flux/guides/image-update/) for automatic version updating.
 
+We believe this project should be categorized as advanced, even though the workload seems small, because it extends the project "GitOps" described in the "Project Ideas" pdf by also incorporating automatic image updates.
+
 ### Demo
 
 For demo purposes, we could either create a new repository and show all steps involved, or use an existing repository to demonstrate the (push tag -> generate image -> update manifests -> update deployments) pipeline.
