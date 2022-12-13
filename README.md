@@ -38,7 +38,15 @@ Increase nodes to 2, otherwise it won't run.
 set GITHUB_TOKEN=
 set GITHUB_USER=
 
-flux bootstrap github --components-extra=image-reflector-controller,image-automation-controller --owner=%GITHUB_USER% --repository=Flux-CI-CD --branch=main --path=cluster --interval=1m0s --read-write-key --personal
+flux bootstrap github ^
+    --components-extra=image-reflector-controller,image-automation-controller ^
+    --owner=%GITHUB_USER% ^
+    --repository=Flux-CI-CD ^
+    --branch=main ^
+    --path=cluster ^
+    --interval=1m0s ^
+    --read-write-key ^
+    --personal
 
 kubectl get events -n flux-system --field-selector type=Warning
 ```
@@ -46,12 +54,18 @@ kubectl get events -n flux-system --field-selector type=Warning
 ### 2. Add automatic image updates
 
 ```
-flux create image repository demo --image=hub.docker.com/repository/docker/chripp/app --interval=1m0s --export > ./cluster/app-registry.yaml
+flux create image repository demo ^
+    --image=hub.docker.com/repository/docker/chripp/app ^
+    --interval=1m0s ^
+    --export > ./cluster/app-registry.yaml
 ```
 
 
 ```
-flux create image policy demo --image-ref=demo --select-semver=^v1.0.0 --export > ./cluster/demo-policy.yaml
+flux create image policy demo ^
+    --image-ref=demo ^
+    --select-semver=^v1.0.0 ^
+    --export > ./cluster/demo-policy.yaml
 ```
 
 add to cluster/deployment.yml
@@ -60,7 +74,16 @@ add to cluster/deployment.yml
 ```
 
 ```
-flux create image update flux-system --git-repo-ref=Flux-CI-CD --git-repo-path="./cluster" --checkout-branch=main --push-branch=main --author-name=fluxcdbot --author-email=fluxcdbot@users.noreply.github.com --commit-template="{{range .Updated.Images}}{{println .}}{{end}}" --interval=1m0s --export > ./cluster/demo-automation.yaml
+flux create image update flux-system ^
+    --git-repo-ref=Flux-CI-CD ^
+    --git-repo-path="./cluster" ^
+    --checkout-branch=main ^
+    --push-branch=main ^
+    --author-name=fluxcdbot ^
+    --author-email=fluxcdbot@users.noreply.github.com ^
+    --commit-template="{{range .Updated.Images}}{{println .}}{{end}}" ^
+    --interval=1m0s ^
+    --export > ./cluster/demo-automation.yaml
 ```
 
 ### 3. Add Github Action
