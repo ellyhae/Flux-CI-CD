@@ -26,7 +26,7 @@ As this project seems like a small undertaking we would do this with 2 people in
 | Member      | Tasks |
 | ----------- | ----------- |
 | Christoph Pfleger | Create Proposal (find resources, check feasibility, design illustrations), Adapting CI pipeline, add basic Flux reconciliation |
-| Luis Nachtigal | Add image updates (to Kubernetes cluster and GitHub manifests) |
+| Luis Nachtigall | Add image updates (to Kubernetes cluster and GitHub manifests) |
 
 ## Setup
 
