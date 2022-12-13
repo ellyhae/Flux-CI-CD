@@ -9,9 +9,9 @@ We plan to set up a CI/CD pipeline using GitHub, DockerHub, Kubernetes and Flux.
 
 ![Actor Diagram](assets/project_diagram-2.png)
 
-As shown, the image name would depend on whether a tag was used or not. The kubernetes cluster would only update to version with the same major version and ignore all non semver named images, i.e. main-j7gjk-12034 would be ingored.
+As shown, the image name would depend on whether a tag was used or not. The kubernetes cluster would only update to versions with the same major version and ignore all non semver named images, i.e. main-j7gjk-12034 would be ingored.
 
-As a basis we would use the deployment demo presented in the lecture. We would update the CI pipeline to produce the naming discussed above. We would then add [Flux image updates](https://fluxcd.io/flux/guides/image-update/).
+As a basis we would use the deployment demo presented in the lecture. We would update the CI pipeline to produce the naming discussed above. We would then add Flux for manifest synchronization and [Flux image updates](https://fluxcd.io/flux/guides/image-update/) for automatic version updating.
 
 ### Demo
 
