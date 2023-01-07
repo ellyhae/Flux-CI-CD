@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: demo
-        image: chripp/app:v1.0.1 # {"$imagepolicy": "flux-system:app"}
+        image: chripp/app:v1.0.0 # {"$imagepolicy": "flux-system:app"}
         ports:
         - containerPort: 8888
