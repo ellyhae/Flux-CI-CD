@@ -63,28 +63,28 @@ kubectl get events -n flux-system --field-selector type=Warning
 ### 2. Add automatic image updates
 
 ```
-flux create image repository demo ^
-    --image=hub.docker.com/repository/docker/chripp/app ^
+flux create image repository app ^
+    --image=chripp/app ^
     --interval=1m0s ^
     --export > ./cluster/app-registry.yaml
 ```
 
 
 ```
-flux create image policy demo ^
-    --image-ref=demo ^
+flux create image policy app ^
+    --image-ref=app ^
     --select-semver=^v1.0.0 ^
-    --export > ./cluster/demo-policy.yaml
+    --export > ./cluster/app-policy.yaml
 ```
 
 add to cluster/deployment.yml
 ```
-# {"$imagepolicy": "flux-system:demo"}
+# {"$imagepolicy": "flux-system:app"}
 ```
 
 ```
 flux create image update flux-system ^
-    --git-repo-ref=Flux-CI-CD ^
+    --git-repo-ref=flux-system ^
     --git-repo-path="./cluster" ^
     --checkout-branch=main ^
     --push-branch=main ^
