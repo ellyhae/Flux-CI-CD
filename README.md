@@ -62,6 +62,8 @@ kubectl get events -n flux-system --field-selector type=Warning
 
 ### 2. Add automatic image updates
 
+Create an image repository object, which periodically checks for new images.
+
 ```
 flux create image repository app ^
     --image=chripp/app ^
@@ -69,18 +71,29 @@ flux create image repository app ^
     --export > ./cluster/app-registry.yaml
 ```
 
+Create an image policy, which specifies how images are updated. In this case "^v1.0.0" means that it updates minor and bug versions, but not major versions.
 
 ```
 flux create image policy app ^
     --image-ref=app ^
-    --select-semver=^v1.0.0 ^
+    --select-semver="^v1.0.0" ^
     --export > ./cluster/app-policy.yaml
 ```
 
-add to cluster/deployment.yml
+Wait for reconcilliation, then check that everything works with the command below.
+
+```
+flux get image policy app
+```
+
+In cluster/deployment.yaml after "image: chripp/app:v1.0.0" add:
 ```
 # {"$imagepolicy": "flux-system:app"}
 ```
+
+At this point automatic image updates already work. However, while the live environment would get updated, the github repository would not reflect that. Therefore, there is one last step.
+
+Add an automation object which periodically updates the config files in the github repo.
 
 ```
 flux create image update flux-system ^
@@ -93,6 +106,12 @@ flux create image update flux-system ^
     --commit-template="{{range .Updated.Images}}{{println .}}{{end}}" ^
     --interval=1m0s ^
     --export > ./cluster/demo-automation.yaml
+```
+
+Again wait for reconcilliation, then check for errors.
+
+```
+flux get images all --all-namespaces
 ```
 
 ### 3. Add Github Action
