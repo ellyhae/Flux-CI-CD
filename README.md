@@ -39,14 +39,42 @@ If this is seen as too small or to unrealistic, there is an additional idea we c
 
 ## Setup
 
-Increase nodes to 2, otherwise it won't run.
+### 1. Resource Setup
 
-### 1. Create Flux Files
+- Increase number of nodes to 2, otherwise it won't run. Using gcloud: gcloud console -> Kubernetes Engine -> my-cluster -> Nodes -> default-pool -> Edit -> set "Number of nodes" to 2 -> Save
+
+- Create a github repository and set it as public. Add the "app" folder and the "CI.yml" and "cluster/deployment.yaml" files to the new repository. Change image path in the deployment file to your own docker hub username.
+
+- Create a personal access token with at least "Read and Write access to administration and code" for the repository.
+
+- Create a docker hub access token and add it and your username as repository secrets named DOCKER_HUB_ACCESS_TOKEN and DOCKER_HUB_USERNAME respectively. Repository -> Settings -> Secrets and variables -> Actions -> Repository secrets
+
+In the following, there are points where you have to wait for periodic checks between the cluster and the repository. If you do not want to wait, use the following command at those points:
+
+```
+flux reconcile kustomization flux-system --with-source
+```
+
+Run all of these commands in your local repository folder. Many of these commands just create config files, which then need to be pushed upstream to get synchronized to the cluster.
+
+### 2. Add Github Action
+
+The github workflow we use is based on the one used in the lecture. We adapted it to use github tags as image names when available and also added a condition to prevent runs on automatic fluxcd commits. You can also disable the CI run for a push by including "no-CI" in the last commit message. To use it move "CI.yml" to ".github/workflows/".
+
+After adding the workflow locally and pushing it upstream, create a new release for the repository with the tag "v1.0.0". This will create a new image with that version, which will be used as the base image used in the cluster.
+
+### 3. Create Flux Files
+
+Add your github username and the generated access token to your console environment variables.
 
 ```
 set GITHUB_TOKEN=
 set GITHUB_USER=
+```
 
+Create a link between the cluster and the repository. After this point, any changes to config files in the "cluster" folder will automatically be reflected on the cluster. Change repository name in the command if necessary.
+
+```
 flux bootstrap github ^
     --components-extra=image-reflector-controller,image-automation-controller ^
     --owner=%GITHUB_USER% ^
@@ -56,13 +84,25 @@ flux bootstrap github ^
     --interval=1m0s ^
     --read-write-key ^
     --personal
+```
 
+Push local changes upstream.
+
+Check for errors using the following command. This will inform you if your cluster has too few nodes.
+
+```
 kubectl get events -n flux-system --field-selector type=Warning
 ```
 
-### 2. Add automatic image updates
+If everything worked, the deployment should now be running in the cluster. Check with:
 
-Create an image repository object, which periodically checks for new images.
+```
+kubectl get deployment
+```
+
+### 4. Add automatic image updates
+
+Create an image repository object, which periodically checks for new images. Keep in mind that this image path should be the same as the one used in "cluster/deployment.yaml".
 
 ```
 flux create image repository app ^
@@ -80,6 +120,8 @@ flux create image policy app ^
     --export > ./cluster/app-policy.yaml
 ```
 
+Push local changes upstream.
+
 Wait for reconcilliation, then check that everything works with the command below.
 
 ```
@@ -91,7 +133,7 @@ In cluster/deployment.yaml after "image: chripp/app:v1.0.0" add:
 # {"$imagepolicy": "flux-system:app"}
 ```
 
-At this point automatic image updates already work. However, while the live environment would get updated, the github repository would not reflect that. Therefore, there is one last step.
+If pushed, automatic image updates would already work. However, while the live environment would get updated, the github repository would not reflect that. Therefore, there is one last step.
 
 Add an automation object which periodically updates the config files in the github repo.
 
@@ -108,16 +150,25 @@ flux create image update flux-system ^
     --export > ./cluster/demo-automation.yaml
 ```
 
+Push local changes upstream.
+
 Again wait for reconcilliation, then check for errors.
 
 ```
 flux get images all --all-namespaces
 ```
 
-### 3. Add Github Action
+### 5. Watch in action
 
-Move setup/CI.yml to .github/workflows/
+Generate a new version by making a new release with a higher version tag.
 
+Flux should find this new version and update the pods. Check with:
+
+```
+kubectl get deployment -o yaml
+```
+
+Shortly after this, Flux should push the changed config to the github repository.
 
 ## Remove
 
