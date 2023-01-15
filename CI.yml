@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
 
     # Only run this if the push is not from fluxbot. Cluster Manifests shouldn't be used in dockerfiles, therefore it should not matter. Maybe prevents infinite push loop?
-    if: github.event.head_commit.author.name != 'fluxcdbot'
+    # Also allows for manual disabling of the CI pipeline by using "no-CI" in the commit message
+    if: github.event.head_commit.author.name != 'fluxcdbot' && !contains(github.event.head_commit.message, 'no-CI')
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
