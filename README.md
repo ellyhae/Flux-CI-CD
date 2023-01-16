@@ -59,7 +59,7 @@ Run all of these commands in your local repository folder. Many of these command
 
 ### 2. Add Github Action
 
-The github workflow we use is based on the one used in the lecture. We adapted it to use github tags as image names when available and also added a condition to prevent runs on automatic fluxcd commits. You can also disable the CI run for a push by including "no-CI" in the last commit message. To use it move "CI.yml" to ".github/workflows/".
+The github workflow we use is based on the one used in the lecture. We adapted it to use github tags as image names when available. To use it move "CI.yml" to ".github/workflows/".
 
 After adding the workflow locally and pushing it upstream, create a new release for the repository with the tag "v1.0.0". This will create a new image with that version, which will be used as the base image used in the cluster.
 
@@ -85,8 +85,6 @@ flux bootstrap github ^
     --read-write-key ^
     --personal
 ```
-
-Push local changes upstream.
 
 Check for errors using the following command. This will inform you if your cluster has too few nodes.
 
