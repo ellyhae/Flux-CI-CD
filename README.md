@@ -1,43 +1,19 @@
 # Flux-CI-CD
 Cloud Computing project using GitHub, Kubernetes and Flux for a CI/CD pipeline.
 
-## Proposal
+## Overview / Summary of research
 
-We plan to set up a CI/CD pipeline using GitHub, DockerHub, Kubernetes and Flux. This would include automatic testing and image generation, live deployment updates using these images, deployment manifest updates with new version numbers and deployment manifest synchronization between GitHub and the running cluster.
+This project illustrates how to use Flux for Continuous Deployment. This is done through assigning a GitHub repository as the main authority on what should be running in a cluster and then updating said cluster to match what is described in the repository. Further, images are automatically updated on the cluster according to some update policy and the used version is then updated in the configuration files in the repository.
 
-![Flow Diagram](assets/project_diagram-1.png)
+This is accomplished by separate pods running on the cluster, which serve to observe GitHub and DockerHub repositories and update pods running on the cluster.
 
 ![Actor Diagram](assets/project_diagram-2.png)
 
-As shown, the image name would depend on whether a tag was used or not. The kubernetes cluster would only update to versions with the same major version and ignore all non semver named images, i.e. main-j7gjk-12034 would be ingored.
+Such a setup provides convenient Continuous Deployment and versioning of configurations. In case of issues with a new release the repository can just be reverted to an older stable version.
 
-As a basis we would use the deployment demo presented in the lecture. We would update the CI pipeline to produce the naming discussed above. We would then add Flux for manifest synchronization and [Flux image updates](https://fluxcd.io/flux/guides/image-update/) for automatic version updating.
+Updating image versions in the repository has the advantage that it is included in configuration file versioning and can therefore be reverted to if needed. The drawback is that if a revert is needed, the image update service in the cluster needs to be disabled (or the marker for updates in the config file removed) to stay on the stated version.
 
-We believe this project should be categorized as advanced, because it extends the project "GitOps" described in the "Project Ideas" pdf by also incorporating automatic image updates.
-
-### Intended Development Usage
-
-This would be intended for usage with [Trunk-based development](https://cloud.google.com/architecture/devops/devops-tech-trunk-based-development) shown in the image below.
-
-![Trunk-based development](https://cloud.google.com/static/architecture/devops/images/devops-tech-trunk-based-development-typical-trunk-timeline.svg)
-
-### Demo
-
-For demo purposes, we could create a new repository and show all steps involved or use an existing repository to demonstrate the (push tag -> generate image -> update manifests -> update deployments) pipeline, or both.
-
-### Work split
-
-| Member      | Tasks |
-| ----------- | ----------- |
-| Christoph Pfleger | Create Proposal (find resources, check feasibility, design illustrations), Adapting CI pipeline, add basic Flux reconciliation |
-| Luis Nachtigall | Discussion on how to implement Proposal with Development workflow, Add image updates (to Kubernetes cluster and GitHub manifests) |
-
-### Extra Ideas
-
-If this is seen as too small or to unrealistic, there is an additional idea we could implement:
-- Adding a staging cluster that automatically loads images from normal pushes for testing
-
-## Setup
+## Tutorial
 
 ### 1. Resource Setup
 
@@ -168,9 +144,17 @@ kubectl get deployment -o yaml
 
 Shortly after this, Flux should push the changed config to the github repository.
 
-## Remove
+### 6. Remove
 
 ```
 flux uninstall
 kubectl delete deployment demo
 ```
+
+## Lessons-Learned
+
+Due to our modifications to the CI workflow, we became more familiar with writing them. For example, we learned how to disable a workflow based on who made the last commit of a push, which can be used to disable CI runs on commits by Flux, which do not change the code.
+
+From Flux, we learned that pods running in our cluster can be used for maintenance and observation of outside resources. While this has been mentioned before, it was made much more obvious by Flux using pods to e.g. monitor image repositories for new versions.
+
+We also learned that while Continuous Deployment solutions like Flux can be very customizable, it really helps to consider such things before starting a project. This helps to keep the setup as simple as possible and can help to avoid configuration errors later.
