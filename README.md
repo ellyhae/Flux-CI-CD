@@ -57,7 +57,7 @@ flux bootstrap github ^
     --repository=Flux-CI-CD ^
     --branch=main ^
     --path=cluster ^
-    --interval=1m0s ^
+    --interval=30s ^
     --read-write-key ^
     --personal
 ```
@@ -81,7 +81,7 @@ Create an image repository object, which periodically checks for new images. Kee
 ```
 flux create image repository app ^
     --image=chripp/app ^
-    --interval=1m0s ^
+    --interval=30s ^
     --export > ./cluster/app-registry.yaml
 ```
 
@@ -120,7 +120,7 @@ flux create image update flux-system ^
     --author-name=fluxcdbot ^
     --author-email=fluxcdbot@users.noreply.github.com ^
     --commit-template="{{range .Updated.Images}}{{println .}}{{end}}" ^
-    --interval=1m0s ^
+    --interval=30s ^
     --export > ./cluster/demo-automation.yaml
 ```
 
@@ -139,7 +139,7 @@ Generate a new version by making a new release with a higher version tag.
 Flux should find this new version and update the pods. Check with:
 
 ```
-kubectl get deployment -o yaml
+kubectl get deployment demo -o yaml
 ```
 
 Shortly after this, Flux should push the changed config to the github repository.
