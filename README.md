@@ -136,7 +136,7 @@ flux get images all --all-namespaces
 
 ### GitOps
 
-Change the number of replicas in "deployment.yml". Shortly after, the changes are reflected in the cluster. Check with:
+Change the number of replicas in "deployment.yaml". Shortly after, the changes are reflected in the cluster. Check with:
 
 ```
 kubectl describe deployment demo
