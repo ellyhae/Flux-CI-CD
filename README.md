@@ -1,15 +1,15 @@
 # Flux-CI-CD
-Cloud Computing project using GitHub, Kubernetes and Flux for a CI/CD pipeline.
+Cloud Computing project using GitHub, Kubernetes and Flux for GitOps with CI/CD elements.
 
 ## Overview / Summary of research
 
-This project illustrates how to use Flux for Continuous Deployment. This is done through assigning a GitHub repository as the main authority on what should be running in a cluster and then updating said cluster to match what is described in the repository. Further, images are automatically updated on the cluster according to some update policy and the used version is then updated in the configuration files in the repository.
+This project illustrates how to use Flux for GitOps, extended with elements of CI/CD. This means assigning a GitHub repository as the main authority on what should be running in a cluster and then updating said cluster to match what is described in the repository. Further, we use CI/CD elements to present how images can automatically be updated in the cluster, leading to version updates in the cluster manifests in the repository.
 
-This is accomplished by separate pods running on the cluster, which serve to observe GitHub and DockerHub repositories and update pods running on the cluster.
+To accoplish this, Flux runs several pods on the cluster, which periodically check for discrepancies between outside resources (GitHub, DockerHub) and objects in the cluster.
 
 ![Actor Diagram](assets/project_diagram-2.png)
 
-Such a setup provides convenient Continuous Deployment and versioning of configurations. In case of issues with a new release the repository can just be reverted to an older stable version.
+Such a setup provides convenient versioning of configurations and can be used as one part of a full CD pipeline. Due to versioning, in case of issues with a new release the repository can just be reverted to an older stable version.
 
 Updating image versions in the repository has the advantage that it is included in configuration file versioning and can therefore be reverted to if needed. The drawback is that if a revert is needed, the image update service in the cluster needs to be disabled (or the marker for updates in the config file removed) to stay on the stated version.
 
@@ -134,12 +134,22 @@ flux get images all --all-namespaces
 
 ### 5. Watch in action
 
-Generate a new version by making a new release with a higher version tag.
+### GitOps
 
-Flux should find this new version and update the pods. Check with:
+Change the number of replicas in "deployment.yml". Shortly after, the changes are reflected in the cluster. Check with:
 
 ```
-kubectl get deployment demo -o yaml
+kubectl describe deployment demo
+```
+
+### Image update
+
+Generate a new image version by making a new release with a higher version tag.
+
+Flux should find this new version and update the pods. Again, check with:
+
+```
+kubectl describe deployment demo
 ```
 
 Shortly after this, Flux should push the changed config to the github repository.
