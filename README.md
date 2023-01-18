@@ -3,7 +3,7 @@ Cloud Computing project using GitHub, Kubernetes and Flux for GitOps with CI/CD 
 
 ## Overview / Summary of research
 
-This project illustrates how to use Flux for GitOps, extended with elements of CI/CD. This means assigning a GitHub repository as the main authority on what should be running in a cluster and then updating said cluster to match what is described in the repository. Further, we use CI/CD elements to present how images can automatically be updated in the cluster, leading to version updates in the cluster manifests in the repository.
+This project illustrates how to use Flux for GitOps, extended with elements of CI/CD. This means assigning a GitHub repository as the main authority on what should be running in a cluster and then updating said cluster to match what is described in the repository. Further, we use CI/CD elements to present how image versions can automatically be updated in the versioned manifests, leading to updates in the cluster.
 
 To accoplish this, Flux runs several pods on the cluster, which periodically check for discrepancies between outside resources (GitHub, DockerHub) and objects in the cluster.
 
